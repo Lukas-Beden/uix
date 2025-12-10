@@ -7,13 +7,6 @@ public class ItemData : ScriptableObject
     [SerializeField] private string _name;
     [SerializeField] private Sprite _icon;
 
-    public string GetName()
-    {
-        return _name;
-    }
-
-    public Sprite GetIcon()
-    {
-        return _icon;
-    }
+   public string Name => _name;
+   public Sprite Icon => _icon;
 }
