@@ -10,18 +10,17 @@ public class InventoryView : MonoBehaviour
 
     public void CreateSlotViews(int count)
     {
-        // Détruire les anciens slots
         foreach (SlotView slot in _slotViews)
         {
             Destroy(slot.gameObject);
         }
         _slotViews.Clear();
 
-        // Créer les nouveaux
         for (int i = 0; i < count; i++)
         {
             GameObject slotObj = Instantiate(_slotPrefab, _slotContainer);
             SlotView slotView = slotObj.GetComponent<SlotView>();
+            slotView.SetSlotIndex(i);
             _slotViews.Add(slotView);
         }
     }
@@ -34,6 +33,22 @@ public class InventoryView : MonoBehaviour
             {
                 _slotViews[i].UpdateDisplay(slotsData[i]);
             }
+        }
+    }
+
+    public void SubscribeToSlotClicks(System.Action<int> callback)
+    {
+        foreach (SlotView slotView in _slotViews)
+        {
+            slotView.OnSlotClicked += callback;
+        }
+    }
+
+    public void UnsubscribeFromSlotClicks(System.Action<int> callback)
+    {
+        foreach (SlotView slotView in _slotViews)
+        {
+            slotView.OnSlotClicked -= callback;
         }
     }
 }

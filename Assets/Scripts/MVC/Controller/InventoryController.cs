@@ -7,37 +7,51 @@ public class InventoryController : MonoBehaviour
 
     private void Start()
     {
-        // Initialiser la vue avec le nombre de slots du modèle
+        _model.OnInventoryChanged += OnInventoryChanged;
         _view.CreateSlotViews(_model.MaxSlots);
+        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked); 
         UpdateView();
+    }
+
+    private void OnDestroy()
+    {
+        _model.OnInventoryChanged -= OnInventoryChanged;
+        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
+    }
+    private void OnInventoryChanged()
+    {
+        UpdateView();
+    }
+
+    private void RemoveItemOnSlotClicked(int slotIndex)
+    {
+        _model.RemoveItem(slotIndex);
     }
 
     public void AddItem(ItemData item)
     {
-        if (_model.AddItem(item))
-        {
-            UpdateView();
-        }
+        _model.AddItem(item);
     }
 
     public void RemoveItem(int slotIndex)
     {
         _model.RemoveItem(slotIndex);
-        UpdateView();
     }
 
     public void AddSlot()
     {
+        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
         _model.AddSlot();
         _view.CreateSlotViews(_model.Slots.Count);
-        UpdateView();
+        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked);
     }
 
     public void RemoveSlot()
     {
+        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
         _model.RemoveSlot();
         _view.CreateSlotViews(_model.Slots.Count);
-        UpdateView();
+        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked);
     }
 
     private void UpdateView()
