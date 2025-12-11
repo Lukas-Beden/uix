@@ -41,6 +41,18 @@ public class InventoryModel : MonoBehaviour
         return null;
     }
 
+    public GameObject GetEmptySlot()
+    {
+        foreach (var slot in _slots)
+        {
+            if (!slot.Value.IsFilled)
+            {
+                return slot.Key;
+            }
+        }
+        return null;
+    }
+
     public Transform AddItem(ItemModel item)
     {
         foreach (var slot in _slots)
@@ -52,5 +64,27 @@ public class InventoryModel : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void RemoveItem(ItemModel item)
+    {
+        if (item == null)
+        {
+            Debug.Log("Trying to remove null item");
+            return;
+        }
+
+        foreach (var slot in _slots)
+        {
+            if (slot.Value.Item == item)
+            {
+                Debug.Log($"Removed item from slot {slot.Key}");
+                slot.Value.ClearItem();
+                break;
+            } else
+            {
+                Debug.Log($"Nah from slot {slot.Key}");
+            }
+        }
     }
 }

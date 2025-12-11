@@ -31,16 +31,18 @@ public class InventoryController : MonoBehaviour
 
     public void AddItem(GameObject item)
     {
-        ItemModel itemModel = item.GetComponent<ItemModel>();
-        Transform slot = _model.AddItem(itemModel);
-        if (slot != null)
+        GameObject slotObj = _model.GetEmptySlot();
+
+        if (slotObj != null)
         {
-            Instantiate(item, slot);
+            GameObject newItem = Instantiate(item, slotObj.transform);
+            ItemModel itemModel = newItem.GetComponent<ItemModel>();
+            _model.Slots[slotObj].SetItem(itemModel);
         }
     }
 
-    public void RemoveItem(GameObject item)
+    public void RemoveItem(ItemModel item)
     {
-
+        _model.RemoveItem(item);
     }
 }

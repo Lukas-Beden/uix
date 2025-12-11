@@ -1623,6 +1623,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Inventory
       objectReference: {fileID: 0}
+    - target: {fileID: 7043291190622668550, guid: b4076d73153011d448f897ab498e643e, type: 3}
+      propertyPath: m_TagString
+      value: Inventory
+      objectReference: {fileID: 0}
     - target: {fileID: 7777674859358738926, guid: b4076d73153011d448f897ab498e643e, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
