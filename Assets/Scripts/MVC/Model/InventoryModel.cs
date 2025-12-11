@@ -1,66 +1,56 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class InventoryModel : MonoBehaviour
 {
     [SerializeField] private int _maxSlots = 3;
-    private List<SlotData> _slots = new List<SlotData>();
+    private Dictionary<GameObject, SlotData> _slots = new Dictionary<GameObject, SlotData>();
+
+    [SerializeField] private GameObject _slotPrefab;
+    [SerializeField] private Transform _slotContainer;
 
     public event Action OnInventoryChanged;
 
     public int MaxSlots => _maxSlots;
-    public List<SlotData> Slots => _slots;
+    public Dictionary<GameObject, SlotData> Slots => _slots;
+    public GameObject SlotPrefab => _slotPrefab;
+    public Transform SlotContainer => _slotContainer;
 
-    private void Awake()
+
+    public void Initialize(GameObject newSlot)
     {
-        InitializeSlots();
+        _slots[newSlot] = new SlotData();
+    }
+    public void AddSlot(GameObject newSlot)
+    {
+        _slots[newSlot] = new SlotData();
     }
 
-    private void InitializeSlots()
+    public GameObject RemoveSlot()
     {
-        for (int i = 0; i < _maxSlots; i++)
+        foreach (var slot in _slots.Reverse())
         {
-            _slots.Add(new SlotData());
-        }
-    }
-
-    public bool AddItem(ItemData item)
-    {
-        foreach (SlotData slot in _slots)
-        {
-            if (!slot.IsFilled)
+            if (!slot.Value.IsFilled)
             {
-                slot.SetItem(item);
-                OnInventoryChanged?.Invoke();
-                return true;
+                _slots.Remove(slot.Key);
+                return slot.Key;
             }
         }
-        return false;
+        return null;
     }
 
-    public void RemoveItem(int slotIndex)
+    public Transform AddItem(ItemModel item)
     {
-        _slots[slotIndex].ClearItem();
-        OnInventoryChanged?.Invoke();
-    }
-
-    public void AddSlot()
-    {
-        _slots.Add(new SlotData());
-        OnInventoryChanged?.Invoke();
-    }
-
-    public void RemoveSlot()
-    {
-        foreach (SlotData slot in _slots)
+        foreach (var slot in _slots)
         {
-            if (!slot.IsFilled)
+            if (!slot.Value.IsFilled)
             {
-                _slots.Remove(slot);
-                OnInventoryChanged?.Invoke();
-                return;
+                slot.Value.SetItem(item);
+                return slot.Key.transform;
             }
         }
+        return null;
     }
 }

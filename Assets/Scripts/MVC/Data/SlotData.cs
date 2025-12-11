@@ -1,15 +1,12 @@
-using UnityEngine;
-using static UnityEditor.Progress;
-
 public class SlotData
 {
-    [SerializeField] private bool _isFilled = false;
-    [SerializeField] private ItemData _item = null;
+    private bool _isFilled;
+    private ItemModel _item;
 
     public bool IsFilled => _isFilled;
-    public ItemData Item => _item;
+    public ItemModel Item => _item;
 
-    public void SetItem(ItemData newItem)
+    public void SetItem(ItemModel newItem)
     {
         _item = newItem;
         _isFilled = true;

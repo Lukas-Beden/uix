@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class InventoryController : MonoBehaviour
 {
@@ -7,55 +8,39 @@ public class InventoryController : MonoBehaviour
 
     private void Start()
     {
-        _model.OnInventoryChanged += OnInventoryChanged;
-        _view.CreateSlotViews(_model.MaxSlots);
-        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked); 
-        UpdateView();
-    }
-
-    private void OnDestroy()
-    {
-        _model.OnInventoryChanged -= OnInventoryChanged;
-        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
-    }
-    private void OnInventoryChanged()
-    {
-        UpdateView();
-    }
-
-    private void RemoveItemOnSlotClicked(int slotIndex)
-    {
-        _model.RemoveItem(slotIndex);
-    }
-
-    public void AddItem(ItemData item)
-    {
-        _model.AddItem(item);
-    }
-
-    public void RemoveItem(int slotIndex)
-    {
-        _model.RemoveItem(slotIndex);
+        for (int i = 0; i < _model.MaxSlots; i++)
+        {
+            AddSlot();
+        }
     }
 
     public void AddSlot()
     {
-        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
-        _model.AddSlot();
-        _view.CreateSlotViews(_model.Slots.Count);
-        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked);
+        GameObject slotObj = Instantiate(_model.SlotPrefab, _model.SlotContainer);
+        _model.AddSlot(slotObj);
     }
 
     public void RemoveSlot()
     {
-        _view.UnsubscribeFromSlotClicks(RemoveItemOnSlotClicked);
-        _model.RemoveSlot();
-        _view.CreateSlotViews(_model.Slots.Count);
-        _view.SubscribeToSlotClicks(RemoveItemOnSlotClicked);
+        GameObject slotToRemove = _model.RemoveSlot();
+        if (slotToRemove)
+        {
+            Destroy(slotToRemove);
+        }
     }
 
-    private void UpdateView()
+    public void AddItem(GameObject item)
     {
-        _view.UpdateAllSlots(_model.Slots);
+        ItemModel itemModel = item.GetComponent<ItemModel>();
+        Transform slot = _model.AddItem(itemModel);
+        if (slot != null)
+        {
+            Instantiate(item, slot);
+        }
+    }
+
+    public void RemoveItem(GameObject item)
+    {
+
     }
 }
