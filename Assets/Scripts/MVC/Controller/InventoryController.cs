@@ -6,6 +6,8 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private InventoryModel _model;
     [SerializeField] private InventoryView _view;
 
+    public InventoryModel Model => _model;
+
     private void Start()
     {
         for (int i = 0; i < _model.MaxSlots; i++)
