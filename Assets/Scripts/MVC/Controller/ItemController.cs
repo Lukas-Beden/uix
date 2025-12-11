@@ -6,13 +6,7 @@ using UnityEngine.UIElements;
 public class ItemController : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [SerializeField] private ItemModel _model;
-    [SerializeField] private ItemView _view;
     [SerializeField] private InventoryController _inventoryController;
-
-    private Transform _originalParent;
-    private Vector3 _originalPosition;
-
-    private bool _isDragging;
 
     public void Start()
     {
@@ -21,9 +15,8 @@ public class ItemController : MonoBehaviour, IPointerClickHandler, IBeginDragHan
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!_isDragging)
+        if (!_model.IsDragging)
         {
-            Debug.Log("Pointer Click");
             var itemModel = GetComponent<ItemModel>();
             _inventoryController.RemoveItem(itemModel);
             Destroy(gameObject);
@@ -32,27 +25,22 @@ public class ItemController : MonoBehaviour, IPointerClickHandler, IBeginDragHan
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log("Begin Drag");
-        _isDragging = true;
-
-        _originalParent = transform.parent;
-        _originalPosition = transform.position;
+        _model.SetDragging(true);
+        _model.SetOriginalParent(transform.parent);
 
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log("Dragging");
         transform.position = Mouse.current.position.ReadValue();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log("End Drag");
-        _isDragging = false;
+        _model.SetDragging(false);
 
         GameObject closestSlot = null;
-        float minDistance = 20f;
+        float minDistance = 35f;
 
         foreach (var slot in _inventoryController.Model.Slots)
         {
@@ -69,7 +57,7 @@ public class ItemController : MonoBehaviour, IPointerClickHandler, IBeginDragHan
         {
             if (!_inventoryController.Model.Slots[closestSlot].IsFilled)
             {
-                _inventoryController.Model.Slots[_originalParent.gameObject].ClearItem();
+                _inventoryController.Model.Slots[_model.OriginalParent.gameObject].ClearItem();
                 transform.SetParent(closestSlot.transform);
                 transform.localPosition = Vector3.zero;
                 _inventoryController.Model.Slots[closestSlot].SetItem(_model);
@@ -82,15 +70,15 @@ public class ItemController : MonoBehaviour, IPointerClickHandler, IBeginDragHan
                 transform.SetParent(closestSlot.transform);
                 transform.localPosition = Vector3.zero;
 
-                otherItem.gameObject.transform.SetParent(_originalParent);
+                otherItem.gameObject.transform.SetParent(_model.OriginalParent);
                 otherItem.gameObject.transform.localPosition = Vector3.zero;
 
                 _inventoryController.Model.Slots[closestSlot].SetItem(selectedItem);
-                _inventoryController.Model.Slots[_originalParent.gameObject].SetItem(otherItem);
+                _inventoryController.Model.Slots[_model.OriginalParent.gameObject].SetItem(otherItem);
             }
         } else
         {
-            transform.SetParent(_originalParent);
+            transform.SetParent(_model.OriginalParent);
             transform.localPosition = Vector3.zero;
         }
     }
